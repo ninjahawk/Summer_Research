@@ -89,7 +89,7 @@ repulsion, velocity-aligning flocking force, self-propulsion toward a target spe
 random noise. The interplay of these four forces produces a rich behavioral phase space,
 including crystalline order, disordered fluid motion, and coherent streaming flocks.
 
-This report covers thirty-one investigations, producing forty-nine numbered findings.
+This report covers thirty-two investigations, producing fifty numbered findings.
 The first three sections establish the baseline: implementation validation and the v_eq
 analytical result (Section 4.1), parameter sweeps and flock formation (Section 4.2),
 and the solid-to-fluid transition tested as a true phase transition (Section 4.3).
@@ -128,7 +128,10 @@ that the vaccination null results extend to 3D. Sections 4.29 and 4.30 then test
 report's own synthesis against itself: a pre-registered prediction (that a topological
 alignment force would slow mixing and rescue targeted vaccination) is falsified, and a
 contact-graph-freezing experiment shows the degree-targeting null result is structural
-rather than kinematic — sharpening the synthesis of Section 5.
+rather than kinematic — sharpening the synthesis of Section 5. Section 4.32 closes the
+phase-transition thread: a hard-repulsion Langevin simulation (exponent n = 12 and 24)
+still does not crystallize, because a higher exponent in this force form shrinks the
+effective core rather than hardening it.
 
 ---
 
@@ -1607,6 +1610,59 @@ count can seal all three axes of a sphere the way a 2D ring seals both axes of a
 
 ---
 
+### 4.32 Hard Repulsion Does Not Crystallize: A Higher Exponent Shrinks the Core (Finding 50)
+
+Section 4.22 (Finding 40) measured the hexatic order parameter |psi_6| under a Langevin
+thermostat and found the n = 1.5 soft repulsion incapable of crystallizing at any
+temperature, with |psi_6| flat near 0.4. That section closed the phase-transition thread
+provisionally, with an explicit recommendation: demonstrating the KTHNY transition would
+require "a near-hard-core Langevin simulation (n >= 12)." This section runs precisely that
+experiment — the Section 4.22 protocol with repulsion exponents n = 12 and n = 24, at
+dense packings C = 0.70 and C = 0.85 (langevin_hexatic_hard.py, N = 50/100/200,
+N_SEEDS = 6, N_ITER = 12000).
+
+| n  | C    | psi6 (kT=0.002) | psi6 (kT=3.0) | chi_psi6 peak (N=50 → 200) |
+|----|------|-----------------|---------------|----------------------------|
+| 12 | 0.70 | 0.38–0.39       | 0.385         | 0.0041 → 0.0009 (falls)    |
+| 12 | 0.85 | 0.34            | 0.344         | 0.0031 → 0.0005 (falls)    |
+| 24 | 0.70 | 0.38–0.39       | 0.386         | 0.0033 → 0.0007 (falls)    |
+| 24 | 0.85 | 0.34            | 0.344         | 0.0020 → 0.0004 (falls)    |
+
+![](./figures/finding50_langevin_hexatic_hard.png)
+
+**Hard repulsion does not crystallize, and the Section 4.22 recommendation fails.** The
+hexatic order parameter is flat near 0.34–0.39 across the entire temperature range, for
+both exponents and both densities — indistinguishable from the n = 1.5 result. The
+low-temperature and high-temperature values agree to within 0.005: there is no rise toward
+a solid-phase value of 1 and no collapse toward a fluid value of 0. The hexatic
+susceptibility chi_psi6 is tiny and *decreases* with N, the opposite of a genuine
+transition. No KTHNY transition appears at any exponent tested.
+
+**A higher exponent shrinks the core; it does not harden it.** The recommendation in
+Section 4.22 rested on a misreading of the force form. The repulsion is
+strength = eps * base_r^n / d with base_r = 1 - d/r_b ranging from 0 to 1. For large n,
+base_r^n is negligible unless base_r is near 1 — that is, unless the separation d is very
+close to zero. Numerically the force factor base_r^n at d = 0.5 r_b is 0.354 for n = 1.5
+but 2.4×10⁻⁴ for n = 12 and 6×10⁻⁸ for n = 24. Raising the exponent collapses the
+effective interaction range toward d → 0: at n = 24 the repulsion is negligible beyond
+d ≈ 0.05 r_b. A higher exponent therefore turns the agents into nearly-free particles with
+a tiny pointlike core — effectively *more* dilute and *less* able to order, not harder.
+
+**The phase-transition thread closes, definitively and with a correction.** Taken with
+Section 4.19 (the exponent sweep in the non-Langevin model), Section 4.21 (the Langevin
+thermostat thermalizes correctly), and Section 4.22 (n = 1.5 hexatic flat), this result
+shows the Charbonneau force model cannot crystallize at any exponent of its base_r^n
+repulsion — because no such exponent produces a genuine finite-sized hard core. The
+low-temperature runs do start from a random quench, so kinetic arrest is a formal
+possibility, but the decisive evidence is annealing-independent: chi_psi6 falls with N
+rather than growing, and |psi_6| is identical at the hardest and softest exponents.
+Exhibiting KTHNY melting would require a genuinely different repulsion — a true
+inverse-power-law force ~ d^-n, or a WCA/hard-disc form — not a higher exponent in the
+model as written. The solid-to-fluid behavior of this model is a smooth crossover, at any
+exponent and at any temperature.
+
+---
+
 ## 5. Synthesis: Alignment-Driven Kinematic Mixing as a Unifying Mechanism
 
 Several of the strongest results in this study — the failure of spatial vaccination
@@ -1873,7 +1929,7 @@ spatial-clustering mechanism that inflates the threshold.
 
 ## 7. Conclusions
 
-This study produced twenty-two main results (selecting the most general across 49 findings):
+This study produced twenty-three main results (selecting the most general across 50 findings):
 
 1. **Equilibrium speed:** The cruise speed of an aligned flock is v_eq = v0 + alpha/mu,
    exactly. This is a direct consequence of the force equations and must be accounted
@@ -1999,8 +2055,8 @@ This study produced twenty-two main results (selecting the most general across 4
     growth. The mechanism is that the smooth n = 1.5 contact-avoidance potential allows agents to
     overlap at any finite kT, preventing the rigid hexagonal lattice required for KTHNY melting.
     Demonstrating the KTHNY transition in this model family requires a near-hard-core Langevin
-    simulation (n ≥ 12) or a true hard-disc Monte Carlo framework. This closes the phase-
-    transition thread: the correct observable has been identified; a harder potential is needed.
+    simulation (n ≥ 12) or a true hard-disc Monte Carlo framework — a prediction tested
+    and corrected in result 23 below.
 
 18. **The 3D noise-driven crossover is smooth and qualitatively identical to 2D:**
     An extended noise sweep (ramp = 0.5-30) at three 3D system sizes (N = 100, 200, 350)
@@ -2053,6 +2109,21 @@ This study produced twenty-two main results (selecting the most general across 4
     contact network simply has no hubs — and is independent of mixing, whereas the spatial
     vaccination null result genuinely is kinematic. The two null results are distinct
     mechanisms, not one.
+
+23. **Hard repulsion does not crystallize; the phase-transition thread closes negatively:**
+    Result 17 predicted that a near-hard-core Langevin simulation (n >= 12) would exhibit
+    the KTHNY melting transition the soft n = 1.5 potential could not. A direct test with
+    exponents n = 12 and n = 24, at dense packings C = 0.70 and 0.85, falsifies that
+    prediction: the hexatic order parameter |psi_6| stays flat near 0.34-0.39 across the
+    entire temperature range, identical to the n = 1.5 result, and the hexatic
+    susceptibility decreases rather than grows with N. The reason is a property of the
+    force form: the repulsion strength scales as base_r^n with base_r = 1 - d/r_b in
+    [0, 1], so a higher exponent makes the force negligible except at vanishingly small
+    separation — it shrinks the effective interaction range rather than hardening the
+    core. The Charbonneau model cannot crystallize at any exponent of this repulsion;
+    exhibiting KTHNY melting would require a genuinely different potential (a true
+    inverse-power-law or hard-disc form). The solid-to-fluid behavior is a smooth
+    crossover at every exponent and temperature tested.
 
 The consistent thread across all results is that collective alignment is both the source
 of the flock's robustness and the mechanism by which stressors interact. It maintains

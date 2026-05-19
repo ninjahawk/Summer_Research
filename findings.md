@@ -53,6 +53,7 @@ generated). For navigation, here they are grouped by theme:
 - F38 Repulsion hardness null result (n = 1.5-12 identical)
 - F39 Langevin thermostat satisfies FDT (KE/N = kT to 1%)
 - F40 Hexatic order parameter |psi6| flat: soft repulsion cannot crystallize
+- F50 Hard repulsion (n = 12, 24) also flat: higher exponent shrinks the core, not hardens
 
 ### 3D Extension
 - F41 Flocking generalizes to 3D; v_eq exact
@@ -64,6 +65,7 @@ generated). For navigation, here they are grouped by theme:
 - F47 Topological (k-NN) alignment does not slow mixing; the §5 prediction is falsified
 - F48 Freezing the contact graph does not rescue targeting; degree-targeting null is structural
 - F49 3D compression mechanism verified; planar ring arrangement worse than spherical
+- F50 Hard repulsion does not crystallize; higher exponent shrinks the core, not hardens it
 - F44 (planned) 3D predator scaling: how many predators match 2D floor?
 
 ### Floor and Scaling
@@ -1820,6 +1822,57 @@ been shown to fail in 3D. The escape dimension is fundamental: any predator arra
 that leaves one spatial axis unconstrained lets the flock flow along it, and no arrangement
 of a modest predator count can constrain all three axes of a sphere the way a 2D ring
 constrains both axes of a circle.
+
+---
+
+## Finding 50: Hard repulsion does not crystallize either -- raising the exponent shrinks the effective core, it does not harden it
+<img src="./figures/finding50_langevin_hexatic_hard.png" width="640"/>
+
+**What:** Finding 40 measured the hexatic order parameter |psi6| under a Langevin
+thermostat and found the n=1.5 soft repulsion cannot crystallize at any temperature
+(|psi6| flat at ~0.4). F40 closed with an explicit recommendation: "Demonstrating the
+KTHNY transition in this model family requires a near-hard-core Langevin simulation
+(n>=12)." This experiment runs exactly that -- the F40 protocol with repulsion exponents
+n=12 and n=24, at dense packings C=0.70 and C=0.85.
+**Evidence:** langevin_hexatic_hard.py, Langevin thermostat (mu=10, FDT-satisfying noise),
+N=50/100/200, N_SEEDS=6, N_ITER=12000, kT=0.002-3.0.
+  n=12 C=0.85: psi6(kT=0.002)=0.340-0.344  psi6(kT=3.0)=0.344  chi_peak<=0.003
+  n=24 C=0.85: psi6(kT=0.002)=0.339-0.345  psi6(kT=3.0)=0.344  chi_peak<=0.002
+  n=12 C=0.70: psi6(kT=0.002)=0.382-0.389  psi6(kT=3.0)=0.385-0.386
+  n=24 C=0.70: psi6(kT=0.002)=0.381-0.389  psi6(kT=3.0)=0.385-0.386
+**Key result 1 -- hard repulsion does not crystallize, and F40's recommendation fails.**
+|psi6| is flat at ~0.34-0.39 across the ENTIRE temperature range (kT 0.002 to 3.0), for
+BOTH exponents and BOTH densities -- identical to the n=1.5 result of F40. psi6(low kT) and
+psi6(high kT) agree to within 0.005 everywhere: there is no solid-phase rise toward 1 and
+no fluid collapse toward 0. chi_psi6 is tiny (<=0.004) and DECREASES with N
+(0.0041->0.0017->0.0009 at n=12 C=0.70) -- the opposite of a transition, where chi would
+grow with N. There is no KTHNY transition at any exponent tested.
+**Key result 2 -- mechanism: a higher exponent shrinks the core, it does not harden it.**
+The repulsion force is strength = eps * base_r^n / d with base_r = 1 - d/rb. F40's
+recommendation assumed a higher n hardens the contact. It does the opposite. Because
+base_r ranges 0 to 1, base_r^n for large n is negligible UNLESS base_r is near 1, i.e.
+unless d is very close to 0. Numerically the force factor base_r^n at d=0.5*rb is 0.354
+for n=1.5, but 2.4e-4 for n=12 and 6e-8 for n=24. Raising the exponent therefore collapses
+the effective interaction range toward d->0: at n=24 the repulsion is negligible beyond
+d~0.05*rb. A higher n makes the agents into nearly-free particles with a tiny pointlike
+core -- effectively MORE dilute and LESS able to order, not harder. F40's "n>=12"
+prescription rested on a misreading of this force form.
+**Key result 3 -- the phase-transition thread closes definitively negative.**
+Combining F38 (exponent sweep, non-Langevin: identical crossover), F39 (Langevin
+thermalizes correctly), F40 (n=1.5 hexatic flat), and F50 (n=12, 24 hexatic flat): the
+Charbonneau force model cannot crystallize at any repulsion exponent, because no exponent
+of the base_r^n form produces a genuine finite-sized hard core. The solid-to-fluid
+"transition" is a smooth crossover, full stop.
+**Caveat:** Low-kT runs start from a random quench, so kinetic arrest (glass) is a formal
+possibility. But the decisive evidence against a transition is independent of annealing:
+chi_psi6 DECREASES with N rather than growing, and |psi6| is identical at the hardest
+exponent and the softest (F40). If a crystalline phase existed, harder exponents and
+larger N would show at least partial ordering; none appears.
+**Implication:** To exhibit KTHNY melting, the model would need a genuinely different
+repulsion -- a true inverse-power-law potential (force ~ d^-n) or a WCA/hard-disc form --
+not a higher exponent in the existing base_r^n force. This is a corrected and definitive
+close to the phase-transition thread (F2, F9, F17, F38, F39, F40, F50): within the
+Charbonneau model as written, the smooth crossover is the only behavior, at any exponent.
 
 ---
 
