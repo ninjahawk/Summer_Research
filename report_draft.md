@@ -89,7 +89,7 @@ repulsion, velocity-aligning flocking force, self-propulsion toward a target spe
 random noise. The interplay of these four forces produces a rich behavioral phase space,
 including crystalline order, disordered fluid motion, and coherent streaming flocks.
 
-This report covers thirty-three investigations, producing fifty-one numbered findings.
+This report covers thirty-four investigations, producing fifty-two numbered findings.
 The first three sections establish the baseline: implementation validation and the v_eq
 analytical result (Section 4.1), parameter sweeps and flock formation (Section 4.2),
 and the solid-to-fluid transition tested as a true phase transition (Section 4.3).
@@ -133,8 +133,10 @@ phase-transition thread: a hard-repulsion Langevin simulation (exponent n = 12 a
 still does not crystallize, because a higher exponent in this force form shrinks the
 effective core rather than hardening it. Section 4.33 closes the segregation thread in 3D:
 alpha-contrast segregation transfers to three dimensions but is diluted by the extra
-spatial dimension, consistent with the recurring finding that the third dimension acts as
-a mixing aid.
+spatial dimension. Section 4.34 then tests, and falsifies, the tempting interpretation
+that the third dimension speeds up kinematic mixing: a direct measurement shows 3D mixes
+roughly 1.8 times slower than 2D at matched contact degree, so the 3D results are due to
+neighborhood geometry and structural homogeneity, not faster mixing.
 
 ---
 
@@ -1711,11 +1713,68 @@ as a non-flocking gas. There the global order parameter collapses to Phi = 0.523
 two co-moving coherent sub-flocks. For every alpha_passive >= 0.1 the flock stays coherent
 (Phi >= 0.99) and segregation is only mild.
 
-The result completes a consistent picture. Kinematic mixing erodes imposed structure
-equally in 2D and 3D (Section 4.28), and it also erodes self-organized segregation
-*more* effectively in 3D than in 2D. Across every experiment in this study — encirclement,
-vaccination, and now segregation — the third spatial dimension acts as a mixing aid: it
-makes the flock harder to disrupt, harder to target, and harder to sort.
+The natural reading of this dilution — that the third dimension speeds up kinematic
+mixing — is intuitive but, as Section 4.34 shows by direct measurement, wrong. The
+dilution is real, but its cause is the geometry of the neighborhood, not the rate at
+which the neighborhood turns over.
+
+---
+
+### 4.34 The Third Dimension Mixes Slower, Not Faster: A Falsified Interpretive Theme (Finding 52)
+
+Sections 4.28 and 4.33 invited an interpretive theme: that the third spatial dimension
+acts as a "mixing aid," speeding the kinematic reorganization that defeats targeting and
+dilutes segregation. The theme is intuitive — more room to move ought to mean faster
+shuffling — but it rests on inference. Section 4.7 and Section 4.29 measured the *2D*
+contact-graph mixing rate directly; the 3D rate had never been measured. This section
+measures it, in the same self-test spirit as Sections 4.29 and 4.30.
+
+Pure flocks (no predators, no contagion) are run in 2D and 3D at the parameters of the
+respective vaccination experiments, with the contact radius calibrated separately in each
+dimension so the mean contact degree matches at ~8 (mixing_dimension.py, N = 350,
+N_SEEDS = 5). Mixing is the mean Jaccard dissimilarity of each agent's contact-neighbor
+set between snapshots two time units apart.
+
+| ramp | 2D mixing         | 3D mixing         | ratio 3D/2D |
+|------|-------------------|-------------------|-------------|
+| 0.03 | 0.0109 +/- 0.0009 | 0.0060 +/- 0.0006 | 0.55        |
+| 0.10 | 0.0370 +/- 0.0025 | 0.0213 +/- 0.0006 | 0.57        |
+| 0.30 | 0.1086 +/- 0.0042 | 0.0581 +/- 0.0027 | 0.54        |
+| 1.00 | 0.3143 +/- 0.0036 | 0.1839 +/- 0.0048 | 0.59        |
+
+![](./figures/finding52_mixing_dimension.png)
+
+**The theme is falsified: 3D mixes slower.** At every noise level, the 3D contact graph
+rewires at only 0.54-0.59 of the 2D rate, a ratio remarkably stable across a thirtyfold
+range of absolute mixing rates. At matched mean contact degree, the 3D flock's contact
+graph turns over roughly 1.8 times *slower* than the 2D flock's. The third dimension is
+not a mixing aid.
+
+**Why slower.** Matching the mean contact degree forces the 3D contact radius to be about
+three times the 2D one (0.155 versus 0.050), because a ball of given radius holds far more
+agents than a disc of the same radius. A larger contact region takes longer for agents
+moving at the same speed to enter and leave, so the neighbor set is "stickier" and turns
+over more slowly. A surface-to-volume estimate gives turnover ~ 1/R_cont, predicting a
+ratio near 0.32; the measured 0.56 indicates the 3D relative-velocity dispersion is
+somewhat larger, partly offsetting the radius effect.
+
+**Reconciliation.** The 3D results of Sections 4.28 and 4.33 stand, but their causes are
+not faster mixing. Degree-targeted vaccination fails in 3D for the structural reason of
+Section 4.30 — no hubs — which is dimension-independent. Spatial vaccination fails because
+even the slower 3D mixing fully turns the contact graph over many times during a
+hundred-time-unit epidemic: mixing is slower but still far more than sufficient to erase
+spatial coverage. And the segregation dilution of Section 4.33 is a *geometric* effect of
+neighborhood shape: in 3D an agent's neighbors occupy a ball rather than a disc, giving a
+partially-aligned agent more independent directions along which to be surrounded by the
+other type, so instantaneous local purity is diluted regardless of turnover rate.
+
+The corrected statement is this: the third dimension changes neighborhood *geometry* — a
+ball offers more independent directions than a disc — without speeding up mixing; it
+slows mixing. The 3D flock is hard to disrupt (the escape dimension, Sections 4.25-4.31),
+hard to target (structural homogeneity, Section 4.30), and hard to sort (neighborhood
+geometry, Section 4.33), but none of these follows from faster mixing. This is a direct
+self-test catch: an interpretive theme that looked unifying was falsified by the very
+measurement it predicted.
 
 ---
 
@@ -1985,7 +2044,7 @@ spatial-clustering mechanism that inflates the threshold.
 
 ## 7. Conclusions
 
-This study produced twenty-four main results (selecting the most general across 51 findings):
+This study produced twenty-five main results (selecting the most general across 52 findings):
 
 1. **Equilibrium speed:** The cruise speed of an aligned flock is v_eq = v0 + alpha/mu,
    exactly. This is a direct consequence of the force equations and must be accounted
@@ -2187,10 +2246,22 @@ This study produced twenty-four main results (selecting the most general across 
     dimensions. At moderate contrast the 2D and 3D purities are identical (~0.55); at high
     contrast they diverge, with 2D purity climbing to 0.63-0.73 while 3D purity plateaus
     near 0.55 and breaks upward only when the passive population has zero alignment (and
-    the flock loses global coherence). The extra spatial dimension gives partially-aligned
-    agents more directions along which to interpenetrate, so it dilutes self-organized
-    segregation just as it aids the kinematic mixing that defeats targeting — the third
-    dimension is consistently a mixing aid.
+    the flock loses global coherence). The cause is geometric: in 3D an agent's neighbors
+    occupy a ball rather than a disc, giving a partially-aligned agent more independent
+    directions along which to be surrounded by the other type, so instantaneous local
+    purity is diluted.
+
+25. **The third dimension mixes slower, not faster:** A direct measurement of the
+    contact-graph turnover rate, at matched mean contact degree, shows the 3D flock's
+    contact graph rewires at only ~0.56 of the 2D rate — consistently, across a thirtyfold
+    range of noise amplitudes. This falsifies the tempting interpretation that the 3D
+    results above (vaccination nulls, diluted segregation) arise because the extra
+    dimension speeds up kinematic mixing. It does not: matching the contact degree forces
+    a larger 3D contact radius, which makes the neighbor set slower to turn over. The 3D
+    flock is hard to disrupt, target, and sort for three separate reasons — the escape
+    dimension, structural degree-homogeneity, and neighborhood geometry — none of which is
+    faster mixing. This is one of several cases (see also results 22 and 23) where a
+    pre-registered or interpretive prediction was tested and corrected rather than assumed.
 
 The consistent thread across all results is that collective alignment is both the source
 of the flock's robustness and the mechanism by which stressors interact. It maintains

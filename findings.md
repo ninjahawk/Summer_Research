@@ -67,6 +67,7 @@ generated). For navigation, here they are grouped by theme:
 - F49 3D compression mechanism verified; planar ring arrangement worse than spherical
 - F50 Hard repulsion does not crystallize; higher exponent shrinks the core, not hardens it
 - F51 3D alpha-contrast segregation: matches 2D at moderate contrast, diluted at high contrast
+- F52 3D mixes ~1.8x SLOWER than 2D at matched degree; "mixing aid" theme falsified
 - F44 (planned) 3D predator scaling: how many predators match 2D floor?
 
 ### Floor and Scaling
@@ -1921,6 +1922,58 @@ extra dimension favors mixing. Mixing erodes imposed structure equally in 2D and
 (F46-F48), and it also erodes self-organized segregation more effectively in 3D than in 2D
 (F51). A flock in three dimensions is harder to sort and just as hard to target -- the
 third dimension is, consistently across every experiment, a mixing aid.
+
+---
+
+## Finding 52: 3D mixes SLOWER than 2D -- the "third dimension is a mixing aid" theme is falsified
+<img src="./figures/finding52_mixing_dimension.png" width="560"/>
+
+**What:** Findings 46-51 built up an interpretive theme -- that the third spatial dimension
+acts as a "mixing aid" -- which was written into the report (Section 4.33, Conclusion 24).
+But that theme rested on inference, never a direct measurement: F47 measured the 2D
+contact-graph mixing rate, but the 3D rate was never measured. This experiment measures it
+directly, in the same self-test spirit as F47/F48, to verify or falsify the claim.
+**Evidence:** mixing_dimension.py. Pure flocks (no predators, no contagion), 2D and 3D, at
+the parameters of the respective vaccination experiments, N=350, N_SEEDS=5. The contact
+radius is calibrated per dimension so the mean contact degree matches (~8 in both:
+2D R_cont=0.050, 3D R_cont=0.155). Mixing = mean Jaccard dissimilarity of each agent's
+contact-neighbor set between snapshots 2 time units apart. Noise (ramp) is swept.
+  ramp   2D mix            3D mix            ratio 3D/2D
+  0.03   0.0109+/-0.0009   0.0060+/-0.0006   0.55
+  0.10   0.0370+/-0.0025   0.0213+/-0.0006   0.57
+  0.30   0.1086+/-0.0042   0.0581+/-0.0027   0.54
+  1.00   0.3143+/-0.0036   0.1839+/-0.0048   0.59
+**Key result -- the theme is falsified: 3D mixes SLOWER.**
+At every noise level, the 3D contact graph rewires at only ~0.54-0.59 of the 2D rate. The
+ratio is remarkably stable (~0.56) across a 30-fold range of absolute mixing rates. The
+third dimension is NOT a mixing aid -- at matched mean contact degree, the 3D flock's
+contact graph turns over about 1.8x SLOWER than the 2D flock's.
+**Mechanism:** Matching the mean contact degree forces the 3D contact radius to be ~3x
+larger than the 2D one (0.155 vs 0.050), because a ball of given radius holds far more
+agents than a disc. A larger contact region takes longer for agents moving at the same
+speed to enter and leave, so the neighbor set is "stickier" and turns over more slowly.
+(A pure surface-to-volume estimate predicts turnover ~ 1/R_cont, i.e. ratio ~0.32; the
+measured 0.56 indicates the 3D relative-velocity dispersion is somewhat larger, partly
+offsetting the radius effect.)
+**Reconciliation with F46 and F51 -- the 3D results have other causes:**
+(a) F46 (vaccination targeting fails in 3D): degree-targeting fails for the STRUCTURAL
+reason established in F48 (no hubs), which is dimension-independent. Spatial targeting
+fails because, even at the slower 3D rate, the contact graph still fully turns over many
+times during a 100-tu epidemic -- mixing is slower but still more than sufficient to erase
+spatial coverage. F46's mechanism survives; only the "faster" embellishment was wrong.
+(b) F51 (segregation diluted in 3D): this is NOT caused by faster mixing. It is a
+GEOMETRIC effect of the neighborhood shape -- in 3D an agent's neighbors occupy a ball
+rather than a disc, giving a partially-aligned agent more independent directions along
+which to be surrounded by the other type, so instantaneous local purity is geometrically
+diluted. The dilution is about neighborhood geometry, not turnover rate.
+**Implication:** The "third dimension is a mixing aid" theme is wrong and has been removed
+from the report. The corrected statement: the third dimension changes neighborhood
+GEOMETRY (a ball has more independent directions than a disc) without speeding up mixing
+-- in fact it slows mixing by ~1.8x at matched degree. The 3D flock remains hard to
+disrupt (escape dimension, F43-F49), hard to target (structural, F48), and hard to sort
+(geometric, F51), but none of these is due to faster mixing. This finding is a direct
+self-test catch: an interpretive theme that looked unifying was falsified by the
+measurement it predicted.
 
 ---
 
