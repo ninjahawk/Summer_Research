@@ -135,7 +135,7 @@ class Pred3D:
         in_range = (dist > 0) & (dist <= R0_P)
         base = np.maximum(1.0 - dist / R0_P, 0.0)
         strength = np.where(in_range, EPS_P * base**1.5 / (dist + 1e-12), 0.0)
-        return -strength[np.newaxis, :] * d
+        return strength[np.newaxis, :] * d   # push prey away (d = prey - pred)
 
 
 def run_3d(mode, adapt_ratio, seed):
