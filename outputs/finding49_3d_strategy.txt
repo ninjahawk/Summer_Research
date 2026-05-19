@@ -1,0 +1,10 @@
+Finding 49 -- 3D predator arrangement and compression mechanism
+N=350 seeds=5 iter=5000 R_enc=0.15
+
+mode     n_pred  Phi_mean  Phi_std  Rg     <k_align>
+sphere      6   0.9815   0.0216  0.3990  22.01
+sphere     10   0.9128   0.0823  0.3555  41.26
+sphere     20   0.9748   0.0255  0.3118  48.07
+planar      6   0.9710   0.0532  0.3925  24.65
+planar     10   0.9976   0.0005  0.4112  18.78
+planar     20   0.9972   0.0012  0.3988  21.05

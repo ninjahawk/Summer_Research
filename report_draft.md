@@ -1525,6 +1525,67 @@ results are not the same mechanism, and the revised Section 5 separates them.
 
 ---
 
+### 4.31 Predator Arrangement in 3D: Compression Verified, the Planar Ring Refuted (Finding 49)
+
+Sections 4.25-4.27 showed 3D encirclement fails and cannot be rescued by radius, predator
+count, or adaptive geometry, and Section 4.26 proposed a mechanism: adding predators
+compresses the flock, and in 3D that compression densifies it — packing more neighbors
+within each agent's alignment radius — which strengthens the alignment coupling. This
+section does two things: it verifies that mechanism by measuring the mean
+alignment-neighbor count directly, and it tests the natural inference from Section 4.25's
+"a sphere is harder to seal than a ring" argument — namely, that a planar ring of
+predators might do better. Predators are arranged either on a Fibonacci sphere (the
+baseline) or on a ring in the z = z_com plane (flocking3d_strategy.py, N = 350,
+N_SEEDS = 5, R_enc = 0.15).
+
+| mode   | n_pred | Phi             | Rg    | <k_align> |
+|--------|--------|-----------------|-------|-----------|
+| sphere | 6      | 0.981 +/- 0.022 | 0.399 | 22.0      |
+| sphere | 10     | 0.913 +/- 0.082 | 0.355 | 41.3      |
+| sphere | 20     | 0.975 +/- 0.026 | 0.312 | 48.1      |
+| planar | 6      | 0.971 +/- 0.053 | 0.393 | 24.6      |
+| planar | 10     | 0.998 +/- 0.001 | 0.411 | 18.8      |
+| planar | 20     | 0.997 +/- 0.001 | 0.399 | 21.0      |
+
+![](./figures/finding49_3d_strategy.png)
+
+**The compression mechanism is verified.** Under spherical encirclement, as the predator
+count rises from 6 to 10 to 20 the radius of gyration falls monotonically (0.399, 0.355,
+0.312) and the mean alignment-neighbor count rises monotonically (22.0, 41.3, 48.1).
+Adding predators demonstrably compresses and densifies the 3D flock, exactly as
+Section 4.26 claimed.
+
+**Densification is the restoring force, not the whole story.** From n_pred = 10 to 20,
+<k_align> rises from 41 to 48 and Phi rises from 0.913 to 0.975 — densification stabilizes
+the flock as predicted. But from n_pred = 6 to 10, <k_align> also rises (22 to 41) while
+Phi falls (0.981 to 0.913). The behavior is a competition: predator forcing perturbs the
+flock, densification stabilizes it. At n_pred = 10 the perturbation transiently wins — the
+knife-edge of Section 4.26 — and by n_pred = 20 the flock is dense enough
+(<k_align> = 48) that stabilization dominates and coherence is restored. Phi is not a pure
+function of <k_align>; densification is the mechanism by which the flock fights back, not
+a single-valued predictor of the outcome.
+
+**The planar ring is worse, not better.** Section 4.25 argued that a sphere is
+intrinsically harder to seal than a 2D ring, which invites the inference that a ring of
+predators would disrupt more effectively. That inference is refuted. Planar encirclement
+gives Phi = 0.998 at n_pred = 10 and 0.997 at n_pred = 20 — essentially no disruption,
+strictly worse than the already-weak spherical result. The reason is decisive: planar
+predators occupy the z = z_com plane and constrain only the flock's xy extent, so the
+flock simply extends along the unconstrained z axis. Its radius of gyration stays at
+0.39-0.41 and <k_align> stays at 19-25 — the planar ring achieves no compression at all. A
+ring in three dimensions closes nothing; the third dimension is wide open above and below
+it.
+
+This closes the 3D predator thread. Spherical encirclement at least compresses the flock,
+and fails because compression densifies and stabilizes it; the planar ring fails even
+harder because it does not compress. Every geometric variant of encirclement — radius
+(4.25), count (4.26), adaptive tracking (4.27), and now arrangement (4.31) — has been
+shown to fail in 3D. The escape dimension is fundamental: any predator arrangement that
+leaves one spatial axis unconstrained lets the flock flow along it, and no modest predator
+count can seal all three axes of a sphere the way a 2D ring seals both axes of a circle.
+
+---
+
 ## 5. Synthesis: Alignment-Driven Kinematic Mixing as a Unifying Mechanism
 
 Several of the strongest results in this study — the failure of spatial vaccination

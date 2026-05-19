@@ -63,6 +63,7 @@ generated). For navigation, here they are grouped by theme:
 - F46 Vaccination targeting fails in 3D too; kinematic mixing is dimension-independent
 - F47 Topological (k-NN) alignment does not slow mixing; the §5 prediction is falsified
 - F48 Freezing the contact graph does not rescue targeting; degree-targeting null is structural
+- F49 3D compression mechanism verified; planar ring arrangement worse than spherical
 - F44 (planned) 3D predator scaling: how many predators match 2D floor?
 
 ### Floor and Scaling
@@ -1768,6 +1769,57 @@ by motion. The two null results are NOT the same mechanism. The honest unifying 
 is weaker: the flock offers no exploitable structure for vaccination -- either because the
 structure never exists (degree homogeneity) or because mixing erases it (spatial coverage).
 Section 5 has been revised to separate these two mechanisms.
+
+---
+
+## Finding 49: 3D encirclement compression mechanism verified; planar (ring) predator arrangement is worse than spherical, not better
+<img src="./figures/finding49_3d_strategy.png" width="680"/>
+
+**What:** Finding 44 proposed that 3D encirclement fails because adding predators
+compresses the flock, and in 3D compression densifies it (more neighbors within the
+alignment radius), strengthening the alignment coupling. This experiment (a) verifies that
+mechanism by measuring the mean alignment-neighbor count <k_align> directly, and (b) tests
+the report's implicit claim that the spherical predator arrangement is the bottleneck, by
+comparing it against a planar arrangement -- all predators on a ring in the z=z_com plane,
+recreating the 2D encirclement geometry inside the 3D flock.
+**Evidence:** flocking3d_strategy.py, N=350, N_SEEDS=5, N_ITER=5000, R_enc=0.15.
+  mode     n_pred  Phi              Rg      <k_align>
+  sphere      6    0.981+/-0.022    0.399   22.0
+  sphere     10    0.913+/-0.082    0.355   41.3
+  sphere     20    0.975+/-0.026    0.312   48.1
+  planar      6    0.971+/-0.053    0.393   24.6
+  planar     10    0.998+/-0.001    0.411   18.8
+  planar     20    0.997+/-0.001    0.399   21.0
+**Key result 1 -- the F44 compression mechanism is verified.**
+Under spherical encirclement, as n_pred rises 6->10->20 the radius of gyration falls
+monotonically (0.399->0.355->0.312) and the mean alignment-neighbor count rises
+monotonically (22.0->41.3->48.1). Adding predators demonstrably compresses and densifies
+the 3D flock, exactly as Finding 44 claimed.
+**Key result 2 -- densification explains the Phi recovery, but Phi is not a pure function
+of <k_align>.** From n_pred=10 to 20, <k_align> rises 41->48 and Phi rises 0.913->0.975:
+densification stabilizes the flock, as F44 predicted. But from n_pred=6 to 10, <k_align>
+also rises (22->41) while Phi FALLS (0.981->0.913). The picture is a competition: predator
+forcing perturbs the flock, densification stabilizes it. At n_pred=10 the perturbation
+transiently wins (the F44 knife-edge); by n_pred=20 the flock is so dense (<k_align>=48)
+that the stabilization dominates and coherence is restored. The F44 mechanism is the
+restoring force, not the whole story.
+**Key result 3 -- the planar (ring) arrangement is WORSE than spherical, not better.**
+The report (Section 4.25) argued a sphere is intrinsically harder to seal than a 2D ring.
+The natural inference -- that a ring of predators would do better -- is refuted. Planar
+encirclement gives Phi=0.998 at n_pred=10 and 0.997 at n_pred=20: essentially no
+disruption, strictly worse than the (already weak) spherical result. The reason is
+decisive: planar predators sit in the z=z_com plane and constrain only the flock's xy
+extent. The flock simply extends along the unconstrained z axis -- planar Rg stays
+~0.39-0.41 and <k_align> stays ~19-25, i.e. the flock is NOT compressed at all. A ring in
+3D closes nothing; the third dimension is wide open above and below it.
+**Implication:** Closes the 3D predator thread definitively. Spherical encirclement at
+least achieves compression (and fails because compression densifies and stabilizes); the
+planar ring fails even harder because it achieves no compression. Together with F43
+(radius), F44 (count), and F45 (adaptive), every geometric variant of encirclement has now
+been shown to fail in 3D. The escape dimension is fundamental: any predator arrangement
+that leaves one spatial axis unconstrained lets the flock flow along it, and no arrangement
+of a modest predator count can constrain all three axes of a sphere the way a 2D ring
+constrains both axes of a circle.
 
 ---
 
