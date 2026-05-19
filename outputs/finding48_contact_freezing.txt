@@ -1,0 +1,21 @@
+Finding 48 -- contact-graph freezing and targeted vaccination
+N=350 seeds=5  beta=2.50 gamma=2.00
+
+ramp    Phi     mixing(Jaccard/2tu)
+0.003   0.997   0.0036 +/- 0.0023
+0.010   0.997   0.0056 +/- 0.0014
+0.030   0.998   0.0125 +/- 0.0023
+0.100   0.998   0.0364 +/- 0.0018
+0.300   0.991   0.1064 +/- 0.0061
+
+Vaccination (f_ss): targeted advantage = random - targeted
+  ramp=0.003 p=0.20  random=0.3981  targeted=0.4006  adv=-0.0025
+  ramp=0.003 p=0.35  random=0.2520  targeted=0.2539  adv=-0.0019
+  ramp=0.010 p=0.20  random=0.3939  targeted=0.3924  adv=+0.0015
+  ramp=0.010 p=0.35  random=0.2384  targeted=0.2665  adv=-0.0280
+  ramp=0.030 p=0.20  random=0.3887  targeted=0.3765  adv=+0.0121
+  ramp=0.030 p=0.35  random=0.2153  targeted=0.2526  adv=-0.0373
+  ramp=0.100 p=0.20  random=0.3913  targeted=0.3934  adv=-0.0022
+  ramp=0.100 p=0.35  random=0.2502  targeted=0.2108  adv=+0.0394
+  ramp=0.300 p=0.20  random=0.3989  targeted=0.3950  adv=+0.0039
+  ramp=0.300 p=0.35  random=0.2614  targeted=0.2451  adv=+0.0163

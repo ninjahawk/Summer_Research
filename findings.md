@@ -62,6 +62,7 @@ generated). For navigation, here they are grouped by theme:
 - F45 3D adaptive encirclement null result; tracking damps the disruptive fluctuations
 - F46 Vaccination targeting fails in 3D too; kinematic mixing is dimension-independent
 - F47 Topological (k-NN) alignment does not slow mixing; the §5 prediction is falsified
+- F48 Freezing the contact graph does not rescue targeting; degree-targeting null is structural
 - F44 (planned) 3D predator scaling: how many predators match 2D floor?
 
 ### Floor and Scaling
@@ -1711,6 +1712,65 @@ has been updated to record this falsification and the corrected mechanism.
 
 ---
 
+## Finding 48: Freezing the contact graph does NOT rescue targeted vaccination -- the degree-targeting null is structural, not kinematic
+<img src="./figures/finding48_contact_freezing.png" width="680"/>
+
+**What:** Finding 47's revised Section 5 named one genuine escape route for targeted
+vaccination: "freezing the contact graph itself -- suppressing the relative motion of
+agents." This experiment builds that frozen graph and tests whether targeting then works.
+The noise amplitude (ramp) is the book's solid-to-fluid control parameter: at low ramp the
+flock is in its "solid" regime where agents lock into a near-rigid lattice, at high ramp it
+is "fluid" and mixes freely. Sweeping ramp therefore sweeps the contact-graph mixing rate.
+**Evidence:** contact_freezing.py, 2D flocking N=350, N_SEEDS=5, metric alignment, SIS
+contagion (beta=2.5, gamma=2.0). Random vs degree-targeted vaccination at p_immune=0.20
+and 0.35, across ramp = 0.003, 0.01, 0.03, 0.1, 0.3.
+  ramp    Phi     contact mixing (Jaccard/2tu)
+  0.003   0.997   0.0036 +/- 0.0023
+  0.010   0.997   0.0056 +/- 0.0014
+  0.030   0.998   0.0125 +/- 0.0023
+  0.100   0.998   0.0364 +/- 0.0018
+  0.300   0.991   0.1064 +/- 0.0061
+  Targeted advantage (f_ss random minus targeted; positive = targeting wins):
+  ramp    p=0.20    p=0.35
+  0.003   -0.003    -0.002
+  0.010   +0.002    -0.028
+  0.030   +0.012    -0.037
+  0.100   -0.002    +0.039
+  0.300   +0.004    +0.016
+**Key result 1 -- the contact graph really does freeze, in a still-coherent flock.**
+Lowering ramp from 0.3 to 0.003 drops the contact-graph Jaccard turnover from 0.106 to
+0.0036 per 2 tu -- a 30-fold reduction -- while Phi stays at 0.997-0.998 throughout. The
+flock remains a coherent moving flock; only the relative motion of its members is
+suppressed. Section 5's claim (after F47) that a frozen contact graph is "incompatible with
+a flock that moves" was too strong: the solid regime achieves exactly that.
+**Key result 2 -- targeting still fails, at every mixing rate.**
+Despite the 30x range in mixing rate, the targeted-vs-random advantage stays scattered
+around zero (-0.037 to +0.039) with no monotonic trend. At the most frozen point
+(ramp=0.003, mixing=0.0036) the advantage is -0.003 and -0.002 -- targeting is, if
+anything, marginally worse than random. Freezing the contact graph does NOT rescue targeted
+vaccination. The F47-predicted escape route is closed.
+**Key result 3 -- the degree-targeting null is structural, not kinematic.**
+This disentangles two explanations that Finding 36 and the Section 5 synthesis had
+conflated. F36 found degree-targeting fails and attributed it to kinematic mixing
+(rewiring restores hub positions). F48 removes the mixing and targeting STILL fails --
+so mixing was never the operative cause for degree-targeting. The real cause is the one
+F36 also noted but the synthesis under-weighted: the flock contact network has a
+thin-tailed degree distribution (CV~0.68, no true hubs). Hub-targeting only beats random
+on fat-tailed (scale-free) networks; freezing a thin-tailed network does not create hubs.
+The degree-targeting null is a STATIC STRUCTURAL property of the flock graph, present
+whether or not the graph mixes.
+**Implication:** The Section 5 synthesis over-attributed the vaccination null results to
+kinematic mixing. Degree-targeting (F36) fails for a structural reason -- degree
+homogeneity -- that is independent of mixing, as F48 proves by removing the mixing.
+Kinematic mixing remains the correct explanation for the SPATIAL vaccination null (F37):
+spatial coverage is a feature that genuinely exists at any instant and is genuinely erased
+by motion. The two null results are NOT the same mechanism. The honest unifying statement
+is weaker: the flock offers no exploitable structure for vaccination -- either because the
+structure never exists (degree homogeneity) or because mixing erases it (spatial coverage).
+Section 5 has been revised to separate these two mechanisms.
+
+---
+
 ## Open Questions / Next Directions
 1. 3D flocking thread COMPLETE (F41-F46):
    - F41: v_eq=v0+alpha/mu exact in 3D; basic noise sweep
@@ -1721,17 +1781,15 @@ has been updated to record this falsification and the corrected mechanism.
    - F46: 3D vaccination null -- kinematic mixing defeats targeting in 3D too
 2. 3D predator thread is fully closed. Encirclement cannot be rescued in 3D by radius
    tuning (F43), predator count (F44), or adaptive geometry (F45).
-3. Section 5 self-test COMPLETE (F47): the topological-alignment prediction was tested
-   and FALSIFIED. k-NN alignment does not slow mixing; targeting still fails. Section 5
-   revised. Kinematic mixing is a property of physical relative motion, not the
-   alignment rule -- mechanism is more robust than originally claimed.
+3. Section 5 self-test COMPLETE (F47, F48): the topological-alignment prediction was
+   FALSIFIED (F47), and freezing the contact graph still does not rescue targeting (F48).
+   The vaccination story is fully resolved: degree-targeting fails structurally (no
+   hubs), spatial-targeting fails kinematically (mixing erases coverage). Section 5
+   revised to separate the two mechanisms. No open escape route remains.
 4. Alternative research directions:
    - A 3D-effective predator strategy that is NOT encirclement: exploit the
      compression-induced density gradient (F44), or attack alignment coupling directly.
      Would validate the F44/F45 mechanistic claim.
-   - Freeze the contact graph directly (suppress relative agent motion) -- F47 identified
-     this as the only genuine route to making targeting work; is there a physical regime
-     (very low noise, very strong alignment) where the contact graph nearly freezes?
    - Phase transition in 3D (hard repulsion Langevin in 3D)
    - Segregation in 3D
    - Agent memory / fatigue models

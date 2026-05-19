@@ -1473,17 +1473,76 @@ originally claimed. The synthesis below has been revised to incorporate this res
 
 ---
 
+### 4.30 Freezing the Contact Graph Does Not Rescue Targeting: The Degree-Targeting Null Is Structural (Finding 48)
+
+Section 4.29 closed one escape route for targeted vaccination and, in its revision of
+Section 5, named another: freezing the contact graph itself by suppressing the relative
+motion of agents. This section builds that frozen graph and tests it. The noise amplitude
+(ramp) is the solid-to-fluid control parameter of the flocking model — at low ramp the
+flock locks into a near-rigid "solid" lattice, at high ramp it is "fluid" — so a sweep in
+ramp is a sweep in contact-graph mixing rate (contact_freezing.py, 2D, N = 350,
+N_SEEDS = 5; random versus degree-targeted vaccination at p_immune = 0.20 and 0.35).
+
+| ramp  | Phi   | contact mixing (Jaccard/2tu) | targeted adv. p=0.20 | targeted adv. p=0.35 |
+|-------|-------|------------------------------|----------------------|----------------------|
+| 0.003 | 0.997 | 0.0036 +/- 0.0023            | −0.003               | −0.002               |
+| 0.010 | 0.997 | 0.0056 +/- 0.0014            | +0.002               | −0.028               |
+| 0.030 | 0.998 | 0.0125 +/- 0.0023            | +0.012               | −0.037               |
+| 0.100 | 0.998 | 0.0364 +/- 0.0018            | −0.002               | +0.039               |
+| 0.300 | 0.991 | 0.1064 +/- 0.0061            | +0.004               | +0.016               |
+
+![](./figures/finding48_contact_freezing.png)
+
+**The contact graph does freeze — in a still-coherent flock.** Lowering ramp from 0.3 to
+0.003 reduces the contact-graph Jaccard turnover thirtyfold, from 0.106 to 0.0036 per two
+time units, while the order parameter holds at 0.997-0.998 throughout. The flock remains a
+coherent moving flock; only the relative motion of its members is suppressed. The
+provisional claim at the end of Section 4.29 — that a frozen contact graph is incompatible
+with a flock that moves — was too strong: the solid regime achieves precisely that.
+
+**Targeting still fails, at every mixing rate.** Across the thirtyfold range of mixing
+rate, the targeted-versus-random advantage remains scattered around zero (−0.037 to
++0.039) with no monotonic trend. At the most frozen point (ramp = 0.003) the advantage is
+−0.003 and −0.002 — degree-targeting is, if anything, marginally worse than random.
+Freezing the contact graph does not rescue targeted vaccination.
+
+**The degree-targeting null is structural, not kinematic.** This result disentangles two
+explanations that Section 4.18 and the original Section 5 had conflated. Section 4.18 found
+degree-targeting ineffective and attributed it to kinematic mixing — rewiring continually
+restores hub positions. Section 4.30 removes the mixing and finds targeting still fails, so
+mixing was never the operative cause for the *degree* strategy. The real cause is the one
+Section 4.18 noted but the synthesis under-weighted: the flock contact network has a
+thin-tailed degree distribution (CV ~ 0.68, no genuine hubs). Hub-targeting outperforms
+random only on fat-tailed, scale-free networks; freezing a thin-tailed network does not
+manufacture hubs. The degree-targeting null is a static structural property of the flock
+graph, independent of whether that graph mixes.
+
+This forces a correction to the synthesis. Kinematic mixing remains the correct
+explanation for the *spatial* vaccination null (Section 4.20): spatial coverage is a
+feature that genuinely exists at every instant and is genuinely erased by agent motion.
+But the *degree* vaccination null has a different, mixing-independent cause. The two null
+results are not the same mechanism, and the revised Section 5 separates them.
+
+---
+
 ## 5. Synthesis: Alignment-Driven Kinematic Mixing as a Unifying Mechanism
 
-Three of the strongest results in this study — the failure of degree-targeted vaccination
-(Section 4.18), the failure of spatial vaccination (Section 4.20), and the dimensional
-specificity of encirclement (Section 4.25) — converge on a single mechanism that also
-explains the reversibility of encirclement damage (Section 4.7), the herd-immunity
-inflation (Section 4.14), and the long-time merge/split steady state (Section 4.15).
-That mechanism is **alignment-driven kinematic mixing**: the flocking force not only
+Several of the strongest results in this study — the failure of spatial vaccination
+(Section 4.20), the dimensional specificity of encirclement (Section 4.25), the
+reversibility of encirclement damage (Section 4.7), the herd-immunity inflation
+(Section 4.14), and the long-time merge/split steady state (Section 4.15) — converge on a
+single mechanism: **alignment-driven kinematic mixing**. The flocking force not only
 aligns velocities but, as a side effect, continuously reorganizes the spatial
-neighborhood graph faster than any static structural feature can be exploited or
+neighborhood graph faster than any *transient* structural feature can be exploited or
 sustained.
+
+One closely related result is deliberately excluded from that list. The failure of
+degree-targeted vaccination (Section 4.18) looks like a mixing result and was originally
+synthesized as one, but Section 4.30 shows it is not: freezing the contact graph by a
+thirtyfold reduction in mixing rate does not rescue degree-targeting. That null is
+*structural* — the flock contact network simply has no hubs to target — and holds whether
+or not the graph mixes. Keeping this case separate is what makes the mixing mechanism
+falsifiable rather than all-explaining, and the distinction is developed below.
 
 The argument is direct. In a flock at Phi ~ 1, all agents move with similar velocity
 but with the small dispersion induced by repulsion, noise, and the local averaging
@@ -1493,19 +1552,33 @@ agent identity — its degree in the contact network, its spatial coordinate, it
 location relative to the flock perimeter — is therefore shuffled on the same
 timescale. Three consequences follow:
 
-**Static targeting collapses to random.** Degree-targeted vaccination assumes a fat
-tail and a stable hub set. The flock has neither: the empirical degree distribution
-has CV ~ 0.68 (Finding 28) and the agents holding the top-degree positions at one
-moment hold different positions seconds later, as shown by the identical
-threshold p_c ~ 0.46 found for both targeted and random strategies (Section 4.18).
-Spatial vaccination, sampled by maxmin farthest-point distance, fails for the same
-reason at p_c ~ 0.46 (Section 4.20). The two null results are not independent
-observations; they are the same mechanism producing the same number. Section 4.28
-extends both null results to 3D: random, spatial, and degree-targeted vaccination
-remain statistically indistinguishable in three dimensions, and the contact-degree
-distribution is if anything less heterogeneous (CV ~ 0.59). Kinematic mixing is
-therefore dimension-independent — the alignment force shuffles agent identity faster
-than the epidemic timescale regardless of the number of spatial dimensions.
+**Targeting collapses to random — for two distinct reasons.** Vaccination targeting can
+fail either because the structure it aims at does not exist, or because that structure
+exists momentarily but is erased before it can be exploited. The flock exhibits one case
+of each, and Section 4.30 is what separates them.
+
+Degree-targeted vaccination assumes a fat-tailed degree distribution with a stable hub
+set. The flock contact network has no fat tail — its degree distribution has CV ~ 0.68
+(Finding 28), close to a random geometric graph, with no agents whose removal would
+disproportionately fragment the contagion network. Hub-targeting therefore cannot beat
+random, and Section 4.30 confirms this is structural rather than kinematic: reducing the
+contact-graph mixing rate thirtyfold (by driving the flock into its solid regime) leaves
+the targeted-versus-random advantage scattered around zero with no trend. The
+degree-targeting null is a static property of the flock graph.
+
+Spatial vaccination is the genuine kinematic-mixing case. Maxmin farthest-point sampling
+does construct a real structural feature — a set of immune agents evenly spread across the
+flock — and at the instant of sampling that coverage is exactly as designed. But the
+coverage is attached to spatial position, and position is precisely what kinematic mixing
+shuffles. By the time the epidemic runs, the immune agents have drifted into the same
+clustered, gap-ridden arrangement as a random sample (Section 4.20). Here mixing is the
+operative cause: the feature exists, and mixing destroys it.
+
+Section 4.28 extends both null results to 3D: random, spatial, and degree-targeted
+vaccination remain statistically indistinguishable in three dimensions, and the
+contact-degree distribution is if anything less heterogeneous (CV ~ 0.59). The
+degree-targeting null is dimension-independent because degree homogeneity is; the spatial
+null is dimension-independent because kinematic mixing is.
 
 **Damage with no internal state is reversible; damage with internal state is not.**
 Encirclement applies a directed external force pattern. Once removed, agent positions
@@ -1523,9 +1596,10 @@ The herd-immunity threshold p_c ~ 0.46 is more than twice the mean-field value
 well-mixed and instantaneously sampled; the spatial-SIS literature treats it
 as static and clustered. The flock is in between: clustered at any instant
 but constantly resampled. The factor-of-two inflation reflects the residual
-clustering that mixing does not fully erase per epidemic timescale, and is
-consistent across both random and targeted strategies because mixing
-homogenizes them.
+clustering that mixing does not fully erase per epidemic timescale. The same
+threshold is found for random and targeted strategies alike — for the two
+distinct reasons set out above: degree-targeting has no hubs to exploit, and
+spatial targeting has its coverage erased by mixing.
 
 **Dimensional specificity of encirclement.** In 2D, six predators arranged on a
 ring around a flock of Rg = 0.30 close off the boundary at angular spacing 60
